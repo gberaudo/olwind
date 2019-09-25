@@ -1,0 +1,17 @@
+{
+  "name": "wind",
+  "version": "1.0.0",
+  "description": "https://pythonhosted.org/pypng/png.html => create pngs in pyton https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html => create grid interpolation from data https://earthscience.stackexchange.com/questions/12057/how-to-interpolate-scattered-data-to-a-regular-grid-in-python",
+  "main": "wind.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.1"
+  }
+}
