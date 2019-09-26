@@ -1,18 +1,38 @@
-const map = window.map = new ol.Map({
+import Map from 'ol/Map';
+import {Style, Icon} from 'ol/style';
+import {createEmpty, boundingExtent, extend, getCenter} from 'ol/extent';
+import {fromLonLat} from 'ol/proj';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import Tile from 'ol/layer/Tile';
+import OSMSource from 'ol/source/OSM';
+import View from 'ol/View';
+
+
+function applyTransform(transform, coordinate) {
+  const x = coordinate[0];
+  const y = coordinate[1];
+  coordinate[0] = transform[0] * x + transform[2] * y + transform[4];
+  coordinate[1] = transform[1] * x + transform[3] * y + transform[5];
+  return coordinate;
+}
+
+
+const map = window.map = new Map({
   target: 'map',
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new Tile({
+      source: new OSMSource()
     })
   ],
-  view: new ol.View({
+  view: new View({
     zoom: 10
   })
 });
 
-const Style = ol.style.Style;
-const Icon = ol.style.Icon;
-const colorAsArray = ol.color.asArray;
 
 const arrowStyles = {};
 ['red', 'green', 'black', 'blue'].forEach(color => {
@@ -25,13 +45,13 @@ const arrowStyles = {};
   arrowStyles[color] = style;
 });
 
-const extent = ol.extent.createEmpty();
+const extent = createEmpty();
 const features = [];
 function addPoint(lonLat, data) {
-  const coordinate = ol.proj.fromLonLat(lonLat);
-  const boundingExtent = ol.extent.boundingExtent([coordinate]);
-  ol.extent.extend(extent, boundingExtent);
-  features.push(new ol.Feature(new ol.geom.Point([...coordinate, data], 'XYM')));
+  const coordinate = fromLonLat(lonLat);
+  const bExtent = boundingExtent([coordinate]);
+  extend(extent, bExtent);
+  features.push(new Feature(new Point([...coordinate, data], 'XYM')));
 }
 
 Promise.all([
@@ -56,13 +76,13 @@ Promise.all([
       addPoint(lonLat, data);
     }
   }
-  const center = ol.extent.getCenter(extent);
+  const center = getCenter(extent);
 
   map.getView().setCenter(center);
-  const source = new ol.source.Vector({
+  const source = new VectorSource({
     features
   });
-  map.addLayer(new ol.layer.Vector({
+  const arrowLayer = new VectorLayer({
     style(feature, resolution) {
       const {speed, rotation} = feature.getGeometry().getCoordinates()[2];
       let color = 'black';
@@ -78,5 +98,24 @@ Promise.all([
       return style;
     },
     source
-  }));
+  });
+  //map.addLayer(arrowLayer);
+
+  const particule = {
+    coordinates: [...center]
+  };
+
+  let previousTime = new Date().getTime();
+  map.on('postcompose', event => {
+    const {context, frameState} = event;
+    const currentTime = new Date().getTime();
+
+    const pixel = applyTransform(frameState.coordinateToPixelTransform, [...particule.coordinates]);
+    context.fillRect(pixel[0], pixel[1], 5, 5);
+    var elapsed = frameState.time - previousTime;
+    previousTime = frameState.time;
+    // Look up the coordinate speed in the table (or even interpolate?)
+    // compute new position
+    map.render();
+  });
 });
