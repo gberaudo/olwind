@@ -101,6 +101,7 @@ Promise.all([
     }
 
     const resolution = frameState.viewState.resolution * 1;
+    const pixelRatio = frameState.pixelRatio;
     particules.forEach(particule => {
       if (particule.coordinates.length === 0 || !containsCoordinate(viewportWithDataExtent, particule.coordinates)) {
         randomizeCoordinates(viewportWithDataExtent, particule.coordinates);
@@ -108,13 +109,16 @@ Promise.all([
       pixel[0] = particule.coordinates[0];
       pixel[1] = particule.coordinates[1];
       applyTransform(frameState.coordinateToPixelTransform, pixel);
-      context.fillRect(pixel[0], pixel[1], PARTICULE_SIZE, PARTICULE_SIZE);
+      context.fillRect(
+        pixel[0] * pixelRatio, pixel[1] * pixelRatio,
+        PARTICULE_SIZE * pixelRatio, PARTICULE_SIZE * pixelRatio
+      );
       --particule.ttl;
       if (particule.ttl < 0) {
         randomizeCoordinates(viewportWithDataExtent, particule.coordinates);
         particule.ttl = INITIAL_TTL;
       }
-  
+
       // Compute new position
       const [u, v] = uvBuffer.getUVSpeed(particule.coordinates);
 
