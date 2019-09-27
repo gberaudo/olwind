@@ -6,6 +6,7 @@
   "prepare": "node -r esm src/prepare_dataset.js",
   "scripts": {
     "lint": "eslint src",
+    "build": "webpack --mode production",
     "test": "jest",
     "start": "webpack-dev-server"
   },
@@ -15,8 +16,10 @@
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
     "babel-jest": "^24.9.0",
+    "copy-webpack-plugin": "^5.0.4",
     "eslint": "^6.4.0",
     "esm": "^3.2.25",
+    "gh-pages": "^2.1.1",
     "html-webpack-plugin": "^3.2.0",
     "jest": "^24.9.0",
     "ol": "^5.3.3",

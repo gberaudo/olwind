@@ -1,0 +1,22 @@
+name: CI build and push
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: build code
+      run: |
+        npm install
+        npm run lint
+        npm run build
+    - name: deploy gh-pages on pushes
+      if: github.event == 'push'
+      run: npm run gh-pages
