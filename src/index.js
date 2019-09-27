@@ -1,5 +1,4 @@
 import Map from 'ol/Map';
-import {Style, Icon} from 'ol/style';
 import {getWidth, getHeight, getCenter, getIntersection, isEmpty, containsCoordinate} from 'ol/extent';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
@@ -10,12 +9,13 @@ import Tile from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
 import View from 'ol/View';
 import UVBuffer, { positionFromIndex, coordinateFromPosition } from './UVBuffer';
+import { createStupidStyle, createBarbsStyle } from './styling';
 
-const ARROW_OPACITY = 0.9;
+const ARROW_OPACITY = 0.2;
 const OSM_OPACTIY = 0.5;
 const INITIAL_TTL = 50;
-const NUMBER_OF_PARTICULES = 1000;
-const PARTICULE_SIZE = 2;
+const NUMBER_OF_PARTICULES = 50000;
+const PARTICULE_SIZE = 1;
 
 function applyTransform(transform, coordinate) {
   const x = coordinate[0];
@@ -46,16 +46,6 @@ const map = window.map = new Map({
 });
 
 
-const arrowStyles = {};
-['red', 'green', 'black', 'blue'].forEach(color => {
-  const style = new Style({
-    image: new Icon({
-      src: 'white-arrow.png',
-      color
-    })
-  });
-  arrowStyles[color] = style;
-});
 
 Promise.all([
   fetch('./metadata.json').then(r => r.json()),
@@ -66,10 +56,6 @@ Promise.all([
   const {extent, width, height} = metadata;
   const uBuffer = new Float32Array(us);
   const vBuffer = new Float32Array(vs);
-  const density = [
-    width / (extent[2] - extent[0]),
-    height / (extent[3] - extent[1]),
-  ];
   let i = 0;
   const features = [];
   for (let line = 0; line < height; ++line) {
@@ -94,33 +80,12 @@ Promise.all([
     features
   });
 
+  const barbStyle = document.location.search.includes('barbs');
+  const style = barbStyle ? createBarbsStyle(uvBuffer) : createStupidStyle(uvBuffer);
   const arrowLayer = new VectorLayer({
-    rotateWithView: true,
     opacity: ARROW_OPACITY,
-    style(feature, resolution) {
-      const symbolSizeInMetersWithPadding = 16 * 2 * resolution;
-      const decimator = Math.max(density[0] * symbolSizeInMetersWithPadding, density[1] * symbolSizeInMetersWithPadding);
-      const {i, column, line} = feature.getGeometry().getCoordinates()[2];
-      if (column % Math.ceil(decimator) !== 0 || line %  Math.ceil(decimator) !== 0) {
-        return null;
-      }
-      const speed = uvBuffer.getSpeed(i);
-      const rotation = uvBuffer.getRotation(i);
-      let color = 'black';
-      if (speed < 0.2) {
-        return null;
-      } else if (speed < 1) {
-        color = 'blue';
-      } else if (speed < 5) {
-        color = 'green';
-      } else {
-        color = 'red';
-      }
-      const style = arrowStyles[color];
-      // OL rotation is positive when clockwise! :/
-      style.getImage().setRotation(-rotation);
-      return style;
-    },
+    updateWhileInteracting: true,
+    style,
     source
   });
   map.addLayer(arrowLayer);

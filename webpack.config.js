@@ -13,6 +13,7 @@ module.exports = {
     template: path.resolve(__dirname, './src/index.ejs'),
   }),
     new CopyPlugin([
+      { from: 'arrows' },
       { from: 'white-arrow.png' },
       { from: '*.bin'},
       { from: 'metadata.json' },

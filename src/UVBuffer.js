@@ -115,6 +115,10 @@ export default class UVBuffer {
     this.rotationBuffer_ = new Float32Array(us.length);
     this.uBuffer_ = us;
     this.vBuffer_ = vs;
+    this.density = [
+      width / (extent[2] - extent[0]),
+      height / (extent[3] - extent[1]),
+    ];
     for (let i = 0; i < us.length; ++i) {
       const u = us[i];
       const v = vs[i];
