@@ -1,5 +1,5 @@
 import Map from 'ol/Map';
-import {getWidth, getHeight, getCenter, getIntersection, isEmpty, containsCoordinate} from 'ol/extent';
+import {createEmpty, getWidth, getHeight, getCenter, getIntersection, isEmpty, containsCoordinate} from 'ol/extent';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 
@@ -98,9 +98,10 @@ Promise.all([
     };
   }
 
+  const viewportWithDataExtent = createEmpty();
   map.on('postcompose', event => {
     const {context, frameState} = event;
-    const viewportWithDataExtent = getIntersection(extent, frameState.extent);
+    getIntersection(extent, frameState.extent, viewportWithDataExtent);
 
     if (isEmpty(viewportWithDataExtent)) {
       return;
