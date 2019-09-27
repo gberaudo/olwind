@@ -63,8 +63,8 @@ Promise.all([
 
   fs.writeFile(metaFile, JSON.stringify({
     extent,
-    width: shape[0],
-    height: shape[1]
+    width: shape[1], // !!
+    height: shape[0] // !!
   }), function(err) {
     if (err) {
         throw new Error(err);

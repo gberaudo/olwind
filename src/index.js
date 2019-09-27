@@ -14,7 +14,7 @@ import { createStupidStyle, createBarbsStyle } from './styling';
 const ARROW_OPACITY = 0.2;
 const OSM_OPACTIY = 0.5;
 const INITIAL_TTL = 50;
-const NUMBER_OF_PARTICULES = 50000;
+const NUMBER_OF_PARTICULES = 10000;
 const PARTICULE_SIZE = 1;
 
 function applyTransform(transform, coordinate) {
