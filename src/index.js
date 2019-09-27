@@ -2,6 +2,7 @@ import Map from 'ol/Map';
 import {createEmpty, getWidth, getHeight, getCenter, getIntersection, isEmpty, containsCoordinate} from 'ol/extent';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
+import {apply as applyTransform} from 'ol/transform';
 
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
@@ -17,13 +18,6 @@ const INITIAL_TTL = 50;
 const NUMBER_OF_PARTICULES = 10000;
 const PARTICULE_SIZE = 1;
 
-function applyTransform(transform, coordinate) {
-  const x = coordinate[0];
-  const y = coordinate[1];
-  coordinate[0] = transform[0] * x + transform[2] * y + transform[4];
-  coordinate[1] = transform[1] * x + transform[3] * y + transform[5];
-  return coordinate;
-}
 
 function randomizeCoordinates(extent, coordinates) {
   coordinates[0] = Math.random() * getWidth(extent) + extent[0];
@@ -96,6 +90,7 @@ Promise.all([
     };
   }
 
+  const pixel = [];
   const viewportWithDataExtent = createEmpty();
   map.on('postcompose', event => {
     const {context, frameState} = event;
@@ -110,7 +105,9 @@ Promise.all([
       if (particule.coordinates.length === 0 || !containsCoordinate(viewportWithDataExtent, particule.coordinates)) {
         randomizeCoordinates(viewportWithDataExtent, particule.coordinates);
       }
-      const pixel = applyTransform(frameState.coordinateToPixelTransform, [...particule.coordinates]);
+      pixel[0] = particule.coordinates[0];
+      pixel[1] = particule.coordinates[1];
+      applyTransform(frameState.coordinateToPixelTransform, pixel);
       context.fillRect(pixel[0], pixel[1], PARTICULE_SIZE, PARTICULE_SIZE);
       --particule.ttl;
       if (particule.ttl < 0) {
