@@ -13,11 +13,11 @@ import UVBuffer, { positionFromIndex, coordinateFromPosition } from './UVBuffer'
 import { createStupidStyle, createBarbsStyle } from './styling';
 import CustomCanvasLayer, { CustomCanvasLayerRenderer } from './CustomCanvasLayer';
 
-const ARROW_OPACITY = 0.4;
-const OSM_OPACTIY = 0.5;
+const ARROW_OPACITY = 0.5;
+const OSM_OPACTIY = 1;
 const INITIAL_TTL = 50;
 const NUMBER_OF_PARTICULES = 10000;
-const PARTICULE_SIZE = 1;
+const PARTICULE_SIZE = 1.5;
 
 
 function randomizeCoordinates(extent, coordinates) {
@@ -130,13 +130,14 @@ Promise.all([
   const customLayer = new CustomCanvasLayer({
     renderFunction: (frameState, context) => {
       const canvas = context.canvas;
+      if (context.fillStyle != 'dimgray') {
+        context.fillStyle = 'dimgray';
+      }
       context.globalAlpha = 0.8;
       context.globalCompositeOperation = 'destination-in';
-      context.fillStyle = 'white';
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.globalAlpha = 1;
       context.globalCompositeOperation = 'source-over';
-      context.fillStyle = 'black';
       advanceParticules(frameState, context);
     }
   });
