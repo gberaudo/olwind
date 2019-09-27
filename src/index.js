@@ -107,6 +107,7 @@ Promise.all([
       return;
     }
 
+    const resolution = frameState.viewState.resolution * 1;
     particules.forEach(particule => {
       if (!particule.coordinates || !containsCoordinate(viewportWithDataExtent, particule.coordinates)) {
         particule.coordinates = randomCoordinate(viewportWithDataExtent);
@@ -121,8 +122,7 @@ Promise.all([
   
       // Compute new position
       const [u, v] = uvBuffer.getUVSpeed(particule.coordinates);
-      const resolution = frameState.viewState.resolution * 1;
-      
+
       particule.coordinates[0] += u * resolution;
       particule.coordinates[1] += v * resolution;
     })
