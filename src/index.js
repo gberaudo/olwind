@@ -11,8 +11,9 @@ import OSMSource from 'ol/source/OSM';
 import View from 'ol/View';
 import UVBuffer, { positionFromIndex, coordinateFromPosition } from './UVBuffer';
 import { createStupidStyle, createBarbsStyle } from './styling';
+import CustomCanvasLayer, { CustomCanvasLayerRenderer } from './CustomCanvasLayer';
 
-const ARROW_OPACITY = 0.2;
+const ARROW_OPACITY = 0.4;
 const OSM_OPACTIY = 0.5;
 const INITIAL_TTL = 50;
 const NUMBER_OF_PARTICULES = 10000;
@@ -92,10 +93,9 @@ Promise.all([
 
   const pixel = [];
   const viewportWithDataExtent = createEmpty();
-  map.on('postcompose', event => {
-    const {context, frameState} = event;
-    getIntersection(extent, frameState.extent, viewportWithDataExtent);
 
+  const advanceParticules = (frameState, context) => {
+    getIntersection(extent, frameState.extent, viewportWithDataExtent);
     if (isEmpty(viewportWithDataExtent)) {
       return;
     }
@@ -125,7 +125,28 @@ Promise.all([
       particule.coordinates[0] += u * resolution;
       particule.coordinates[1] += v * resolution;
     })
+  }
 
-    map.render();
+  const customLayer = new CustomCanvasLayer({
+    renderFunction: (frameState, context) => {
+      const canvas = context.canvas;
+      context.globalAlpha = 0.8;
+      context.globalCompositeOperation = 'destination-in';
+      context.fillStyle = 'white';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.globalAlpha = 1;
+      context.globalCompositeOperation = 'source-over';
+      context.fillStyle = 'black';
+      advanceParticules(frameState, context);
+    }
   });
+  map.addLayer(customLayer);
+  map.getRenderer().registerLayerRenderers([CustomCanvasLayerRenderer])
+
+
+  // map.on('postcompose', event => {
+  //   const {context, frameState} = event;
+  //   advanceParticules(frameState, context);
+  //   map.render();
+  // });
 });
