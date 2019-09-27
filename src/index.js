@@ -1,7 +1,6 @@
 import Map from 'ol/Map';
 import {Style, Icon} from 'ol/style';
-import {createEmpty, boundingExtent, extend, getCenter} from 'ol/extent';
-import {fromLonLat} from 'ol/proj';
+import {getWidth, getHeight, getCenter, getIntersection, isEmpty, containsCoordinate} from 'ol/extent';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 
@@ -10,7 +9,13 @@ import VectorSource from 'ol/source/Vector';
 import Tile from 'ol/layer/Tile';
 import OSMSource from 'ol/source/OSM';
 import View from 'ol/View';
+import UVBuffer, { positionFromIndex, coordinateFromPosition } from './UVBuffer';
 
+const ARROW_OPACITY = 0.9;
+const OSM_OPACTIY = 0.5;
+const INITIAL_TTL = 50;
+const NUMBER_OF_PARTICULES = 1000;
+const PARTICULE_SIZE = 2;
 
 function applyTransform(transform, coordinate) {
   const x = coordinate[0];
@@ -20,16 +25,23 @@ function applyTransform(transform, coordinate) {
   return coordinate;
 }
 
+function randomCoordinate(extent) {
+  return [
+    Math.random() * getWidth(extent) + extent[0],
+    Math.random() * getHeight(extent) + extent[1],
+  ];
+}
 
 const map = window.map = new Map({
   target: 'map',
   layers: [
     new Tile({
+      opacity: OSM_OPACTIY,
       source: new OSMSource()
     })
   ],
   view: new View({
-    zoom: 10
+    zoom: 12
   })
 });
 
@@ -45,77 +57,110 @@ const arrowStyles = {};
   arrowStyles[color] = style;
 });
 
-const extent = createEmpty();
-const features = [];
-function addPoint(lonLat, data) {
-  const coordinate = fromLonLat(lonLat);
-  const bExtent = boundingExtent([coordinate]);
-  extend(extent, bExtent);
-  features.push(new Feature(new Point([...coordinate, data], 'XYM')));
-}
-
 Promise.all([
-  fetch('./grid.json').then(r => r.json()),
-  fetch('./u.json').then(r => r.json()),
-  fetch('./v.json').then(r => r.json()),
+  fetch('./metadata.json').then(r => r.json()),
+  fetch('./u.bin').then(r => r.arrayBuffer()),
+  fetch('./v.bin').then(r => r.arrayBuffer()),
 ]).then(array => {
-  const [grid, us, vs] = array;
-  const shape = grid._metadata.shape;
-  for (let g = 0; g < shape[0]; ++g) {
-    const latGroup = grid.lat[g];
-    const lonGroup = grid.lon[g];
-    const uGroup = us.array[g];
-    const vGroup = vs.array[g];
-    for (let i = 0; i < shape[1]; ++i) {
-      const lonLat = [lonGroup[i], latGroup[i]];
-      const u = uGroup[i];
-      const v = vGroup[i];
-      const speed = Math.sqrt(u * u + v * v);
-      const rotation = Math.atan2(v, u) * 180 / Math.PI;
-      const data = {u, v, speed, rotation};
-      addPoint(lonLat, data);
-    }
+  const [metadata, us, vs] = array;
+  const {extent, width, height} = metadata;
+  const uBuffer = new Float32Array(us);
+  const vBuffer = new Float32Array(vs);
+  const density = [
+    width / (extent[2] - extent[0]),
+    height / (extent[3] - extent[1]),
+  ];
+  let i = 0;
+  const features = [];
+  for (let line = 0; line < height; ++line) {
+    for (let column = 0; column < width; ++column) {
+      const position = positionFromIndex(i, width, height);
+      const coordinate = coordinateFromPosition(extent, width, height, position);
+      features.push(new Feature(new Point([...coordinate, {
+        i,
+        column,
+        line, 
+      }], 'XYM')));
+      ++i;
+    } 
   }
-  const center = getCenter(extent);
+  const uvBuffer = new UVBuffer(uBuffer, vBuffer, width, height, extent);
+  window.uv = uvBuffer;
 
+  const center = getCenter(extent);
   map.getView().setCenter(center);
+
   const source = new VectorSource({
     features
   });
+
   const arrowLayer = new VectorLayer({
+    rotateWithView: true,
+    opacity: ARROW_OPACITY,
     style(feature, resolution) {
-      const {speed, rotation} = feature.getGeometry().getCoordinates()[2];
+      const symbolSizeInMetersWithPadding = 16 * 2 * resolution;
+      const decimator = Math.max(density[0] * symbolSizeInMetersWithPadding, density[1] * symbolSizeInMetersWithPadding);
+      const {i, column, line} = feature.getGeometry().getCoordinates()[2];
+      if (column % Math.ceil(decimator) !== 0 || line %  Math.ceil(decimator) !== 0) {
+        return null;
+      }
+      const speed = uvBuffer.getSpeed(i);
+      const rotation = uvBuffer.getRotation(i);
       let color = 'black';
-      if (speed < 0.5) {
-        color = 'blue';
+      if (speed < 0.2) {
+        return null;
       } else if (speed < 1) {
+        color = 'blue';
+      } else if (speed < 5) {
         color = 'green';
       } else {
         color = 'red';
       }
       const style = arrowStyles[color];
-      style.getImage().setRotation(rotation);
+      // OL rotation is positive when clockwise! :/
+      style.getImage().setRotation(-rotation);
       return style;
     },
     source
   });
-  //map.addLayer(arrowLayer);
+  map.addLayer(arrowLayer);
 
-  const particule = {
-    coordinates: [...center]
-  };
+  const particules = new Array(NUMBER_OF_PARTICULES);
+  for (let i = 0; i < NUMBER_OF_PARTICULES; ++i) {
+    particules[i] = {
+    ttl: Math.random() * INITIAL_TTL,
+    coordinates: null
+    };
+  }
 
-  let previousTime = new Date().getTime();
   map.on('postcompose', event => {
     const {context, frameState} = event;
-    const currentTime = new Date().getTime();
+    const viewportWithDataExtent = getIntersection(extent, frameState.extent);
 
-    const pixel = applyTransform(frameState.coordinateToPixelTransform, [...particule.coordinates]);
-    context.fillRect(pixel[0], pixel[1], 5, 5);
-    var elapsed = frameState.time - previousTime;
-    previousTime = frameState.time;
-    // Look up the coordinate speed in the table (or even interpolate?)
-    // compute new position
+    if (isEmpty(viewportWithDataExtent)) {
+      return;
+    }
+
+    particules.forEach(particule => {
+      if (!particule.coordinates || !containsCoordinate(viewportWithDataExtent, particule.coordinates)) {
+        particule.coordinates = randomCoordinate(viewportWithDataExtent);
+      }
+      const pixel = applyTransform(frameState.coordinateToPixelTransform, [...particule.coordinates]);
+      context.fillRect(pixel[0], pixel[1], PARTICULE_SIZE, PARTICULE_SIZE);
+      --particule.ttl;
+      if (particule.ttl < 0) {
+        particule.coordinates = randomCoordinate(viewportWithDataExtent);
+        particule.ttl = INITIAL_TTL;
+      }
+  
+      // Compute new position
+      const [u, v] = uvBuffer.getUVSpeed(particule.coordinates);
+      const resolution = frameState.viewState.resolution * 1;
+      
+      particule.coordinates[0] += u * resolution;
+      particule.coordinates[1] += v * resolution;
+    })
+
     map.render();
   });
 });
