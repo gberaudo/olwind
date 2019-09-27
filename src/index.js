@@ -25,11 +25,9 @@ function applyTransform(transform, coordinate) {
   return coordinate;
 }
 
-function randomCoordinate(extent) {
-  return [
-    Math.random() * getWidth(extent) + extent[0],
-    Math.random() * getHeight(extent) + extent[1],
-  ];
+function randomizeCoordinates(extent, coordinates) {
+  coordinates[0] = Math.random() * getWidth(extent) + extent[0];
+  coordinates[1] = Math.random() * getHeight(extent) + extent[1];
 }
 
 const map = window.map = new Map({
@@ -94,7 +92,7 @@ Promise.all([
   for (let i = 0; i < NUMBER_OF_PARTICULES; ++i) {
     particules[i] = {
     ttl: Math.random() * INITIAL_TTL,
-    coordinates: null
+    coordinates: []
     };
   }
 
@@ -109,14 +107,14 @@ Promise.all([
 
     const resolution = frameState.viewState.resolution * 1;
     particules.forEach(particule => {
-      if (!particule.coordinates || !containsCoordinate(viewportWithDataExtent, particule.coordinates)) {
-        particule.coordinates = randomCoordinate(viewportWithDataExtent);
+      if (particule.coordinates.length === 0 || !containsCoordinate(viewportWithDataExtent, particule.coordinates)) {
+        randomizeCoordinates(viewportWithDataExtent, particule.coordinates);
       }
       const pixel = applyTransform(frameState.coordinateToPixelTransform, [...particule.coordinates]);
       context.fillRect(pixel[0], pixel[1], PARTICULE_SIZE, PARTICULE_SIZE);
       --particule.ttl;
       if (particule.ttl < 0) {
-        particule.coordinates = randomCoordinate(viewportWithDataExtent);
+        randomizeCoordinates(viewportWithDataExtent, particule.coordinates);
         particule.ttl = INITIAL_TTL;
       }
   
