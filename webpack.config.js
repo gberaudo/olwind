@@ -5,6 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 
 module.exports = {
+  entry: './src/webgl.js',
   output: {
     path: path.resolve(__dirname, './dist'),
     filename: 'bundle.js'
@@ -15,7 +16,7 @@ module.exports = {
   }),
     new CopyPlugin([
       { from: 'arrows/', to: 'arrows/' },
-      { from: 'white-arrow.png' },
+      { from: '*.png' },
       { from: '*.bin'},
       { from: 'metadata.json' },
     ]),

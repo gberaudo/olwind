@@ -108,10 +108,11 @@ export default class UVBuffer {
     if (vs.length != width * height) {
       throw new Error(`Vs size ${vs.length} is not consistent with data dimensions: ${width}x${height}`);
     }
-    this.extent_ = clone(extent);
+    this.extent = clone(extent);
     this.dataWidth_ = width;
     this.dataHeight_ = height;
     this.speedBuffer_ = new Float32Array(us.length);
+    this.simpleSpeedBuffer = new Uint8Array(us.length);
     this.rotationBuffer_ = new Float32Array(us.length);
     this.uBuffer_ = us;
     this.vBuffer_ = vs;
@@ -125,16 +126,17 @@ export default class UVBuffer {
       const speed = Math.sqrt(u * u + v * v);
       const rotation = Math.atan2(v, u);
       this.speedBuffer_[i] = speed;
+      this.simpleSpeedBuffer[i] = Math.ceil(speed);
       this.rotationBuffer_[i] = rotation;
     }
-    console.log('Size: ', this.uBuffer_.length);
+    console.log(`Size: ${this.dataWidth_}x${this.dataHeight_} = ${this.uBuffer_.length}`);
   }
 
 
   getUVSpeed(coordinate) {
     const width = this.dataWidth_;
     const height = this.dataHeight_;
-    const position = positionFromCoordinate(this.extent_, width, height, coordinate);
+    const position = positionFromCoordinate(this.extent, width, height, coordinate);
     const u = interpolatePosition(width, position, this.uBuffer_);
     const v = interpolatePosition(width, position, this.vBuffer_);
     return [u,v];
