@@ -42,7 +42,9 @@ export class CustomWebGLLayerRenderer extends Observable {
     const layer = this.layer;
 
     const ctx = this.canvas_.getContext('webgl');
-    const [width, height] = frameState.size;
+    let [width, height] = frameState.size;
+    width *= frameState.pixelRatio;
+    height *= frameState.pixelRatio;
     if (this.canvas_.width !== width || this.canvas_.height !== height) {
       this.canvas_.width = width;
       this.canvas_.height = height;

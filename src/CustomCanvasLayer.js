@@ -42,7 +42,9 @@ export class CustomCanvasLayerRenderer extends Observable {
     const layer = this.layer;
 
     const ctx = this.canvas_.getContext('2d');
-    const [width, height] = frameState.size;
+    let [width, height] = frameState.size;
+    width *= frameState.pixelRatio;
+    height *= frameState.pixelRatio;
     if (this.canvas_.width !== width || this.canvas_.height !== height) {
       this.canvas_.width = width;
       this.canvas_.height = height;
@@ -60,7 +62,9 @@ export class CustomCanvasLayerRenderer extends Observable {
    * @param {CanvasRenderingContext2D} context Context
    */
   composeFrame(frameState, layerState, context) {
-    context.drawImage(this.canvas_, 0, 0, this.canvas_.width, this.canvas_.height);
+    const width = this.canvas_.width;
+    const height = this.canvas_.height;
+    context.drawImage(this.canvas_, 0, 0, width, height);
   }
 }
 
