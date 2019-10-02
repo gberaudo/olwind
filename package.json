@@ -1,7 +1,7 @@
 {
   "name": "olwind",
   "version": "1.0.0",
-  "description": "https://pythonhosted.org/pypng/png.html => create pngs in pyton https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html => create grid interpolation from data https://earthscience.stackexchange.com/questions/12057/how-to-interpolate-scattered-data-to-a-regular-grid-in-python",
+  "description": "OpenLayers Wind layers with Canvas 2D and WebGL",
   "main": "wind.js",
   "scripts": {
     "prepare": "node -r esm src/prepare_dataset.js",
@@ -11,8 +11,8 @@
     "gh-pages": "rm -rf dist && npm run build && gh-pages -d dist",
     "start": "webpack-dev-server"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "guillaume.beraudo@gmail.com",
+  "license": "BSD-2-Clause",
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
