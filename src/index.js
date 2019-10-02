@@ -10,6 +10,7 @@ import UVBuffer from './UVBuffer';
 import { CanvasWindParticlesLayer } from './CanvasWindParticlesLayer';
 import { ArrowLayer } from './ArrowLayer';
 import { WebGLWindGradientLayer } from './WebGLWindGradientLayer';
+import {defaults as createInteractions} from 'ol/interaction';
 
 const ARROW_OPACITY = 0.5;
 const OSM_OPACTIY = 1;
@@ -20,6 +21,10 @@ const NUMBER_OF_PARTICULES = 10000;
 
 const map = window.map = new Map({
   target: 'map',
+  interactions: createInteractions({
+    altShiftDragRotate: false,
+    pinchRotate: false
+  }),
   layers: [
     new Tile({
       opacity: OSM_OPACTIY,
