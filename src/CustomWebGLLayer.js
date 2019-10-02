@@ -1,5 +1,6 @@
 import Layer from 'ol/layer/Layer'
 import Observable from 'ol/Observable';
+import { resizeCanvasIfNeeded } from './util.js';
 
 
 export class CustomWebGLLayerRenderer extends Observable {
@@ -12,7 +13,7 @@ export class CustomWebGLLayerRenderer extends Observable {
     this.layer = layer;
     this.canvas_ = document.createElement('canvas');
     this.canvas_.classList.add('custom-canvas');
-    // document.body.appendChild(this.canvas_);
+    //document.body.appendChild(this.canvas_);
   }
 
   /**
@@ -41,15 +42,9 @@ export class CustomWebGLLayerRenderer extends Observable {
   prepareFrame(frameState) {
     const layer = this.layer;
 
-    const ctx = this.canvas_.getContext('webgl');
-    let [width, height] = frameState.size;
-    width *= frameState.pixelRatio;
-    height *= frameState.pixelRatio;
-    if (this.canvas_.width !== width || this.canvas_.height !== height) {
-      this.canvas_.width = width;
-      this.canvas_.height = height;
-    }
+    resizeCanvasIfNeeded(frameState, this.canvas_);
 
+    const ctx = this.canvas_.getContext('webgl');
     return layer.doRender_.call(layer, frameState, ctx);
   }
 

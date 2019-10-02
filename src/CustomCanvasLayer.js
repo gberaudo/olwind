@@ -1,5 +1,6 @@
 import Layer from 'ol/layer/Layer'
 import Observable from 'ol/Observable';
+import { resizeCanvasIfNeeded } from './util.js';
 
 
 export class CustomCanvasLayerRenderer extends Observable {
@@ -41,15 +42,9 @@ export class CustomCanvasLayerRenderer extends Observable {
   prepareFrame(frameState) {
     const layer = this.layer;
 
-    const ctx = this.canvas_.getContext('2d');
-    let [width, height] = frameState.size;
-    width *= frameState.pixelRatio;
-    height *= frameState.pixelRatio;
-    if (this.canvas_.width !== width || this.canvas_.height !== height) {
-      this.canvas_.width = width;
-      this.canvas_.height = height;
-    }
+    resizeCanvasIfNeeded(frameState, this.canvas_);
 
+    const ctx = this.canvas_.getContext('2d');
     layer.doRender_(frameState, ctx);
     frameState.animate = true;
     return true;

@@ -16,6 +16,8 @@ const ARROW_OPACITY = 0.5;
 const OSM_OPACTIY = 1;
 const INITIAL_TTL = 50;
 const NUMBER_OF_PARTICULES = 10000;
+const PARTICLE_FADING = 0.75;
+const GRADIENT_OPACITY = 0.25;
 
 
 
@@ -52,7 +54,7 @@ Promise.all([
   window.uv = uvBuffer;
 
   const windGradientLayer = new WebGLWindGradientLayer({
-    opacity: 0.5,
+    opacity: GRADIENT_OPACITY,
     map,
     uvBuffer
   });
@@ -70,7 +72,7 @@ Promise.all([
     map,
     uvBuffer,
     particles: NUMBER_OF_PARTICULES,
-    fading: 0.90,
+    fading: PARTICLE_FADING,
     ttl: INITIAL_TTL
   })
   map.addLayer(windParticlesLayer);

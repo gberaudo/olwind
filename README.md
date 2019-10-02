@@ -3,17 +3,50 @@
 ## Goal
 
 Provide:
+- a smooth particules layer animating the movement of the wind;
 - an arrow layer displaying wind force and direction;
-- a smooth particules layer animating the movement of the wind.
+- a gradient layer displaying wind force;
 
 Particles are kept while panning and zooming, contributing to a nice user experience.
 
-The project currently uses the canvas 2D API making it usable on any browser.
 It is compatible with OpenLayers 5 and probably OpenLayers 4.
 
-## Dataset
 
-You need to provide 3 files:
+## Demo
+See https://gberaudo.github.io/olwind
+
+
+## Local dev
+```
+git clone https://github.com/gberaudo/olwind.git
+cd olwind
+npm install
+npm start
+```
+
+## Limitations / Contribution ideas
+
+
+- handling map rotation
+  - arrows are shifted (OpenLayers bug?);
+  - custom layers dimensions is fix;
+- handling soft-zoom
+  - when the browser uses softzoom (ctrl + wheel on a DOM element) the WebGL layer is shifted;
+- particle speed changes with resolution, it should be fixed (in pixels / frame);
+- WebGL gradient should use a nicer looking gradient (see OL heatmap);
+- particles are not panned together with the map.
+
+If you are interested in working on one of these items, create an issue or contact me so that we can discuss it.
+
+
+## Other interesting projects
+
+- https://github.com/sakitam-fdd/wind-layer
+
+
+## Custom dataset
+
+If you want to use your own data, you need to provide 3 files:
 
 - metadata.json
 ```json
@@ -37,21 +70,4 @@ Where:
   5,  6,  7,  8
   1,  2,  3,  4
   ```
-
-## Demo
-See https://gberaudo.github.io/olwind
-
-
-## Local dev
-```
-git clone https://github.com/gberaudo/olwind.git
-cd olwind
-npm install
-npm start
-```
-
-## Other interesting projects
-
-- https://github.com/sakitam-fdd/wind-layer
-
 

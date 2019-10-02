@@ -44,3 +44,18 @@ export function createMatrix3FromTransform(t) {
     t[4], t[5], 1
   ];
 }
+
+export function resizeCanvasIfNeeded(frameState, canvas) {
+  let [width, height] = frameState.size;
+  width *= frameState.pixelRatio;
+  height *= frameState.pixelRatio;
+  // if (frameState.viewState.rotation !== 0) {
+  //   width = Math.max(width, height) * 1.5;
+  //   height = width;
+  // }
+
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+}
