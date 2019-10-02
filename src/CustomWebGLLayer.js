@@ -58,13 +58,17 @@ export class CustomWebGLLayerRenderer extends Observable {
    * @param {CanvasRenderingContext2D} context Context
    */
   composeFrame(frameState, layerState, context) {
+    context.globalAlpha = this.layer.getOpacity() || 1;
     context.drawImage(this.canvas_, 0, 0, this.canvas_.width, this.canvas_.height);
+    context.globalAlpha = 1;
   }
 }
 
 export default class CustomWebGLLayer extends Layer {
   constructor(options) {
-    super({});
+    super({
+      opacity: options.opacity
+    });
     this.doRender_ = options.renderFunction;
   }
 

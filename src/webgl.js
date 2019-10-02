@@ -12,9 +12,9 @@ import { WebGLWindGradientLayer } from './WebGLWindGradientLayer';
 const map = window.map = new Map({
   target: 'map',
   layers: [
-    // new Tile({
-    //   source: new OSMSource()
-    // })
+    new Tile({
+      source: new OSMSource()
+    })
   ],
   view: new View({
     zoom: 12
@@ -45,7 +45,7 @@ Promise.all([
     map,
     uvBuffer
   });
-  map.getView().fit(uvBuffer.extent, map.getSize());
   map.addLayer(customLayer);
 
+  map.getView().fit(uvBuffer.extent, map.getSize());
 });

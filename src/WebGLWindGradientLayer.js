@@ -14,6 +14,7 @@ export function createTransform(uvBuffer, map) {
 export class WebGLWindGradientLayer extends CustomWebGLLayer {
   constructor(options) {
     super({
+      opacity: options.opacity,
       renderFunction: (...args) => { return this.reallyDoRender_(...args); }
     });
 

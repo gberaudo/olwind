@@ -9,6 +9,7 @@ import View from 'ol/View';
 import UVBuffer from './UVBuffer';
 import { CanvasWindParticlesLayer } from './CanvasWindParticlesLayer';
 import { ArrowLayer } from './ArrowLayer';
+import { WebGLWindGradientLayer } from './WebGLWindGradientLayer';
 
 const ARROW_OPACITY = 0.5;
 const OSM_OPACTIY = 1;
@@ -44,6 +45,13 @@ Promise.all([
 
   const uvBuffer = new UVBuffer(uBuffer, vBuffer, width, height, extent);
   window.uv = uvBuffer;
+
+  const windGradientLayer = new WebGLWindGradientLayer({
+    opacity: 0.5,
+    map,
+    uvBuffer
+  });
+  map.addLayer(windGradientLayer);
 
   const barbsStyle = document.location.search.includes('barbs') ? 'barbs' : null;
   const arrowLayer = new ArrowLayer({
