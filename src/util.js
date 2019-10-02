@@ -57,5 +57,6 @@ export function resizeCanvasIfNeeded(frameState, canvas) {
   if (canvas.width !== width || canvas.height !== height) {
     canvas.width = width;
     canvas.height = height;
+    return true;
   }
 }

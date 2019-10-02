@@ -34,7 +34,6 @@ npm start
   - when the browser uses softzoom (ctrl + wheel on a DOM element) the WebGL layer is shifted;
 - particle speed changes with resolution, it should be fixed (in pixels / frame);
 - WebGL gradient should use a nicer looking gradient (see OL heatmap);
-- particles are not panned together with the map.
 
 If you are interested in working on one of these items, create an issue or contact me so that we can discuss it.
 

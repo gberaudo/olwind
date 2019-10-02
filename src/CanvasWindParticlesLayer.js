@@ -13,21 +13,18 @@ function randomizeCoordinates(extent, coordinates) {
 export class CanvasWindParticlesLayer extends CustomCanvasLayer {
 
   constructor(options) {
-    const fading = options.fading || 0.8;
     super({
+      /**
+       * @param {import('ol/PluggableMap').FrameState} frameState
+       */
       renderFunction: (frameState, context) => {
-        const canvas = context.canvas;
-        if (context.fillStyle != 'dimgray') {
-          context.fillStyle = 'dimgray';
-        }
-        context.globalAlpha = fading;
-        context.globalCompositeOperation = 'destination-in';
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.globalAlpha = 1;
-        context.globalCompositeOperation = 'source-over';
-        this.advanceParticles(frameState, context);
+
+        return this.render(frameState, context);
       }
     });
+
+    this.fading = options.fading || 0.8;
+
     console.assert(options.ttl);
     this.ttl = options.ttl;
 
@@ -51,6 +48,22 @@ export class CanvasWindParticlesLayer extends CustomCanvasLayer {
 
     this.map.getRenderer().registerLayerRenderers([CustomCanvasLayerRenderer])
     this.particleSize = 1.5;
+  }
+
+  render(frameState, context) {
+    const canvas = context.canvas;
+    if (context.fillStyle != 'dimgray') {
+      context.fillStyle = 'dimgray';
+    }
+
+    this.advanceParticles(frameState, context);
+
+    context.globalAlpha = this.fading;
+    context.globalCompositeOperation = 'destination-in';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.globalAlpha = 1;
+    context.globalCompositeOperation = 'source-over';
+
   }
 
   advanceParticles(frameState, context) {
