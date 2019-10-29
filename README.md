@@ -16,6 +16,10 @@ It is compatible with OpenLayers 5 and probably OpenLayers 4.
 See https://gberaudo.github.io/olwind
 
 
+## Blog post
+See https://github.com/gberaudo/olwind/blob/master/blog.md
+
+
 ## Local dev
 ```
 git clone https://github.com/gberaudo/olwind.git
