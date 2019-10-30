@@ -4,7 +4,7 @@
 
 OpenLayers is a popular JS library used to display advanced maps in the browser. It relies on the canvas API to render both image and vector data. I wanted to have a stab at implementing some particles and gradient layers. This opportunity came last summer when I received a "Camptocamp grant" to make it a reality; I would like to thank my colleagues who voted enthusiastically for my proposition.
 
-Here is a short video of the results:
+Here is a short video of the results (data from [Meteotest](https://meteotest.ch/wetter/wind), thanks to them!):
 
 ![Video of the results](https://github.com/gberaudo/olwind/blob/master/video.gif)
 
