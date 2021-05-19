@@ -9,23 +9,23 @@
     "build": "webpack --mode production",
     "test": "jest",
     "gh-pages": "rm -rf dist && npm run build && gh-pages -d dist",
-    "start": "webpack-dev-server"
+    "start": "webpack serve --mode development"
   },
   "author": "guillaume.beraudo@gmail.com",
   "license": "BSD-2-Clause",
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
-    "babel-jest": "^24.9.0",
-    "copy-webpack-plugin": "^5.0.4",
-    "eslint": "^6.4.0",
+    "babel-jest": "^26.6.3",
+    "copy-webpack-plugin": "^8.1.1",
+    "eslint": "^7.26.0",
     "esm": "^3.2.25",
-    "gh-pages": "^2.1.1",
-    "html-webpack-plugin": "^3.2.0",
-    "jest": "^24.9.0",
+    "gh-pages": "^3.1.0",
+    "html-webpack-plugin": "^5.3.1",
+    "jest": "^26.6.3",
     "ol": "^5.3.3",
-    "webpack": "^4.41.0",
-    "webpack-cli": "^3.3.9",
+    "webpack": "^5.37.1",
+    "webpack-cli": "^4.7.0",
     "webpack-dev-server": "^3.8.1"
   }
 }

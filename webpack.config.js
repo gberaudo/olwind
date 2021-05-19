@@ -14,11 +14,14 @@ module.exports = {
   plugins: [new HtmlWebpackPlugin({
     template: path.resolve(__dirname, './src/index.ejs'),
   }),
-    new CopyPlugin([
-      { from: 'arrows/', to: 'arrows/' },
-      { from: '*.png' },
-      { from: '*.bin'},
-      { from: 'metadata.json' },
-    ]),
+    new CopyPlugin(
+      {
+        patterns: [
+        { from: 'arrows/', to: 'arrows/' },
+        { from: '*.png' },
+        { from: '*.bin'},
+        { from: 'metadata.json' },
+      ]
+    }),
   ]
 };
